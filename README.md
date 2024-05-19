@@ -4,7 +4,7 @@
 
 - mongoose connection event
 - exit code
--
+- jwt / cookies
 
 ```js
 npm i mongoose nodemailer
