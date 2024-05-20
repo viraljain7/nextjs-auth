@@ -1,19 +1,48 @@
 "use client";
-
-import React, { useState } from "react";
-import axios from "axios";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { toast } from "react-hot-toast";
 
-const Signup = () => {
-  const [buttonDisabled, setButtonDisabled] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const [user, setUser] = useState({
-    username: "",
+export default function SignupPage() {
+  const router = useRouter();
+  const [user, setUser] = React.useState({
     email: "",
     password: "",
+    username: "",
   });
+  const [buttonDisabled, setButtonDisabled] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+
+  const onSignup = async (e: any) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/users/signup", user);
+      toast.success("login succesfully");
+      console.log("Signup success", response.data);
+      router.push("/login");
+    } catch (error: any) {
+      console.log("Signup failed", error.message);
+
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      user.email.length > 0 &&
+      user.password.length > 0 &&
+      user.username.length > 0
+    ) {
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
+    }
+  }, [user]);
 
   const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
@@ -22,17 +51,12 @@ const Signup = () => {
       [name]: value,
     }));
   };
-
-  const onSignup = async () => {
-    try {
-    } catch (error) {}
-  };
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900  py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
-            Sign up
+            {loading ? "Processing" : "Sign up"}
           </h2>
         </div>
         <form className="mt-8 space-y-6">
@@ -89,9 +113,16 @@ const Signup = () => {
             <button
               type="submit"
               onClick={onSignup}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
+                buttonDisabled
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-indigo-600 hover:bg-indigo-700"
+              } focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                buttonDisabled ? "" : "focus:ring-indigo-500"
+              }`}
+              disabled={buttonDisabled}
             >
-              Sign up
+              sign up
             </button>
           </div>
           <div className="flex-left inline bg-white/10 rounded-md text-sm underline text-white px-4 py-1 my-4">
@@ -101,6 +132,4 @@ const Signup = () => {
       </div>
     </div>
   );
-};
-
-export default Signup;
+}

@@ -1,31 +1,57 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import { toast } from "react-hot-toast";
 
-const Login = () => {
-  const [formData, setFormData] = useState({
+export default function LoginPage() {
+  const router = useRouter();
+  const [user, setUser] = React.useState({
     email: "",
     password: "",
   });
+  const [buttonDisabled, setButtonDisabled] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+
+  const onLogin = async (e: any) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/users/login", user);
+      toast.success("login succesfully");
+      console.log("Login success", response.data);
+      router.push("/profile");
+    } catch (error: any) {
+      console.log("Login failed", error.message);
+
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user.email.length > 0 && user.password.length > 0) {
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
+    }
+  }, [user]);
 
   const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
+    setUser((prevData) => ({
       ...prevData,
       [name]: value,
     }));
   };
-
-  const onLogin = async () => {};
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-900  py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
-            Log in
+            {loading ? "Processing" : "Login"}
           </h2>
         </div>
         <form className="mt-8 space-y-6">
@@ -41,7 +67,7 @@ const Login = () => {
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
-                value={formData.email}
+                value={user.email}
                 onChange={handleChange}
               />
             </div>
@@ -56,7 +82,7 @@ const Login = () => {
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
-                value={formData.password}
+                value={user.password}
                 onChange={handleChange}
               />
             </div>
@@ -66,19 +92,23 @@ const Login = () => {
             <button
               type="submit"
               onClick={onLogin}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
+                buttonDisabled
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-indigo-600 hover:bg-indigo-700"
+              } focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                buttonDisabled ? "" : "focus:ring-indigo-500"
+              }`}
+              disabled={buttonDisabled}
             >
-              Log in
+              Login
             </button>
           </div>
-
           <div className="flex-left inline bg-white/10 rounded-md text-sm underline text-white px-4 py-1 my-4">
-            <Link href="/signup">Create a Account</Link>
+            <Link href="/sign">Create An Account</Link>
           </div>
         </form>
       </div>
     </div>
   );
-};
-
-export default Login;
+}
