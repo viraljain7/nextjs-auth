@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const { email, password } = reqBody; // Extract the email and password from the request body
 
     // Log the request body to the console (for debugging purposes)
-    console.log(reqBody);
+    // console.log(reqBody);
 
     // Check if a user with the given email exists in the database
     const user = await User.findOne({ email });

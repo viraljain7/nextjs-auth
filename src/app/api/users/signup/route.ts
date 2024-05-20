@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const { username, email, password } = reqBody; // Extract the username, email, and password from the request body
 
     // Log the request body to the console (for debugging purposes)
-    console.log(reqBody);
+    // console.log(reqBody);
 
     // Check if a user with the given email already exists in the database
     const user = await User.findOne({ email });
@@ -43,9 +43,9 @@ export async function POST(request: NextRequest) {
     // Save the new user to the database
     const savedUser = await newUser.save();
     // Log the saved user to the console (for debugging purposes)
-    console.log(savedUser);
-
+    // console.log(savedUser);
     // Send a verification email to the new user
+
     await sendEmail({ email, emailType: "VERIFY", userId: savedUser._id });
 
     // Return a success response with the message and the saved user data

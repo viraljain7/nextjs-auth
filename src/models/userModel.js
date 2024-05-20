@@ -1,3 +1,5 @@
+
+
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
@@ -28,9 +30,8 @@ const userSchema = new mongoose.Schema({
     verifyToken: String,
     verifyTokenExpiry: Date,
 })
-
-
 //special case in NextJs
+
 const User = mongoose.models.users || mongoose.model("users", userSchema);
 
 export default User;
