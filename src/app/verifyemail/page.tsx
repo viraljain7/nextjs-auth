@@ -25,7 +25,7 @@ const VerifyEmailPage = () => {
         await axios.post("/api/users/verifyemail", { token });
         setIsVerified(true);
       } catch (error) {
-        setError(error.response ? error.response.data : error.message);
+        setError(null);
       }
     };
 
