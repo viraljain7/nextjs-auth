@@ -1,45 +1,47 @@
 "use client";
 import axios from "axios";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-const verifyEmailPage = () => {
-  //   const router = useRouter();
+const VerifyEmailPage = () => {
   const [token, setToken] = useState("");
-  const [Verified, setVerified] = useState(false);
-  const [error, setError] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [error, setError] = useState(null);
 
-  const verifyUserEmail = async () => {
-    try {
-      await axios.post("/api/users/verifyemail", { token });
-      setVerified(true);
-    } catch (error: any) {
-      setError(true);
-      console.log(error.response);
-      console.log(error.response.data);
-    }
-  };
-
-  //using Javascript Extracting token
   useEffect(() => {
-    const urlToken = window.location.search.split("=")[1];
-    setToken(urlToken || "");
+    // Extract token from URL query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenFromUrl = urlParams.get("token");
+
+    // Set token state
+    if (tokenFromUrl) {
+      setToken(tokenFromUrl);
+    }
   }, []);
 
-  //@b using NextJs Extracting token
-  //   useEffect(() => {
-
-  //     const { query } = router;
-  //     const urlToken = query.token;
-  //   }, [router]);
-
   useEffect(() => {
+    // Function to verify email using the token
+    const verifyUserEmail = async () => {
+      try {
+        await axios.post("/api/users/verifyemail", { token });
+        setIsVerified(true);
+      } catch (error) {
+        setError(error.response ? error.response.data : error.message);
+      }
+    };
+
+    // Call verifyUserEmail if token is available
     if (token) {
       verifyUserEmail();
     }
   }, [token]);
-  return <h1>under Processing</h1>;
+
+  return (
+    <div>
+      {error && <p>Error: {error}</p>}
+      {!error && !isVerified && <p>Verifying email...</p>}
+      {isVerified && <p>Email verified successfully!</p>}
+    </div>
+  );
 };
 
-export default verifyEmailPage;
+export default VerifyEmailPage;
